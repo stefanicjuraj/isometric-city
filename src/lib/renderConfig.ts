@@ -78,7 +78,7 @@ const SPRITE_PACK_RED: SpritePack = {
     'factory_large',
     // Row 5 (indices 25-29)
     'airport',
-    '',
+    'water',
     '',
     '',
     'museum',
@@ -228,6 +228,7 @@ const SPRITE_PACK_SPRITES4: SpritePack = {
     airport: 'airport',
     space_program: 'space_program',
     tree: 'tree',
+    water: 'water',
   },
 };
 
@@ -321,6 +322,7 @@ const SPRITE_PACK_SPRITES4_BG: SpritePack = {
     airport: 'airport',
     space_program: 'space_program',
     tree: 'tree',
+    water: 'water',
   },
 };
 
