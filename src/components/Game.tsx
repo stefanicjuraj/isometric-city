@@ -1025,6 +1025,7 @@ const BUILDING_IMAGES: Record<string, string> = {
   water_tower: '/assets/buildings/watertower.png',
   power_plant: '/assets/buildings/powerplant.png',
   stadium: '/assets/buildings/stadium.png',
+  tree: '/assets/buildings/trees.png',
 };
 
 // Canvas-based Isometric Grid - HIGH PERFORMANCE
@@ -1169,6 +1170,13 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
     let rightColor = '#5a8f4f';
     let strokeColor = '#2d4a26';
     
+    // Check if this is a building (not grass, empty, water, road, or tree)
+    const isBuilding = tile.building.type !== 'grass' && 
+                       tile.building.type !== 'empty' && 
+                       tile.building.type !== 'water' && 
+                       tile.building.type !== 'road' && 
+                       tile.building.type !== 'tree';
+    
     if (tile.building.type === 'water') {
       topColor = '#2563eb';
       leftColor = '#1d4ed8';
@@ -1179,6 +1187,12 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
       leftColor = '#3a3a3a';
       rightColor = '#5a5a5a';
       strokeColor = '#333';
+    } else if (isBuilding) {
+      // White tiles for all buildings
+      topColor = '#ffffff';
+      leftColor = '#e5e5e5';
+      rightColor = '#f5f5f5';
+      strokeColor = '#cccccc';
     } else if (tile.zone === 'residential') {
       if (tile.building.type !== 'grass' && tile.building.type !== 'empty') {
         topColor = '#3d7c3f';
@@ -1269,7 +1283,9 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
       if (buildingType === 'power_plant') sizeMultiplier = 2.5;
       else if (buildingType === 'stadium') sizeMultiplier = 3.5;
       else if (buildingType === 'university') sizeMultiplier = 2.8;
-      else if (buildingType === 'hospital') sizeMultiplier = 2.2;
+      else if (buildingType === 'hospital') sizeMultiplier = 1.65; // Scaled down 25% from 2.2
+      else if (buildingType === 'fire_station') sizeMultiplier = 1.35; // Scaled down 25% from 1.8
+      else if (buildingType === 'police_station') sizeMultiplier = 1.35; // Scaled down 25% from 1.8
     }
     
     if (imageSrc && imageCache.has(imageSrc)) {
@@ -1288,25 +1304,6 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
         Math.round(imgSize),
         Math.round(imgSize)
       );
-    } else if (buildingType === 'tree') {
-      // Draw tree with trunk and canopy
-      const treeX = x + w / 2;
-      const treeBaseY = y + h * 0.3;
-      
-      // Trunk
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(treeX - 2, treeBaseY - 15, 4, 18);
-      
-      // Canopy (layered ellipses for depth)
-      ctx.fillStyle = '#15803d';
-      ctx.beginPath();
-      ctx.ellipse(treeX, treeBaseY - 22, 12, 16, 0, 0, Math.PI * 2);
-      ctx.fill();
-      
-      ctx.fillStyle = '#22c55e';
-      ctx.beginPath();
-      ctx.ellipse(treeX - 2, treeBaseY - 25, 8, 12, 0, 0, Math.PI * 2);
-      ctx.fill();
     } else if (buildingType === 'road') {
       // Roads are handled in tile drawing, but draw road markings here
       const cx = x + w / 2;

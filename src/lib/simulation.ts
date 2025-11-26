@@ -74,31 +74,68 @@ function generateLakes(grid: Tile[][], size: number, seed: number): void {
   
   // Find lake seed points (local minimums in noise)
   const lakeCenters: { x: number; y: number; noise: number }[] = [];
-  const minDistFromEdge = 8;
-  const minDistBetweenLakes = size * 0.25; // Keep lakes well separated
+  const minDistFromEdge = Math.max(5, Math.floor(size * 0.1)); // Adaptive edge distance
+  const minDistBetweenLakes = Math.max(size * 0.2, 10); // Adaptive but ensure minimum separation
   
-  // Collect all potential lake centers
-  for (let y = minDistFromEdge; y < size - minDistFromEdge; y++) {
-    for (let x = minDistFromEdge; x < size - minDistFromEdge; x++) {
-      const noiseVal = lakeNoise(x, y);
-      
-      // Check if this is a good lake center (low noise value)
-      if (noiseVal < 0.3) {
-        // Check distance from other lake centers
-        let tooClose = false;
-        for (const center of lakeCenters) {
-          const dist = Math.sqrt((x - center.x) ** 2 + (y - center.y) ** 2);
-          if (dist < minDistBetweenLakes) {
-            tooClose = true;
-            break;
-          }
-        }
+  // Collect all potential lake centers with adaptive threshold
+  // Start with a lenient threshold and tighten if we find too many
+  let threshold = 0.5;
+  let attempts = 0;
+  const maxAttempts = 3;
+  
+  while (lakeCenters.length < 2 && attempts < maxAttempts) {
+    lakeCenters.length = 0; // Reset for this attempt
+    
+    for (let y = minDistFromEdge; y < size - minDistFromEdge; y++) {
+      for (let x = minDistFromEdge; x < size - minDistFromEdge; x++) {
+        const noiseVal = lakeNoise(x, y);
         
-        if (!tooClose) {
-          lakeCenters.push({ x, y, noise: noiseVal });
+        // Check if this is a good lake center (low noise value)
+        if (noiseVal < threshold) {
+          // Check distance from other lake centers
+          let tooClose = false;
+          for (const center of lakeCenters) {
+            const dist = Math.sqrt((x - center.x) ** 2 + (y - center.y) ** 2);
+            if (dist < minDistBetweenLakes) {
+              tooClose = true;
+              break;
+            }
+          }
+          
+          if (!tooClose) {
+            lakeCenters.push({ x, y, noise: noiseVal });
+          }
         }
       }
     }
+    
+    // If we found enough centers, break
+    if (lakeCenters.length >= 2) break;
+    
+    // Otherwise, relax the threshold for next attempt
+    threshold += 0.1;
+    attempts++;
+  }
+  
+  // If still no centers found, force create at least 2 lakes at strategic positions
+  if (lakeCenters.length === 0) {
+    // Place lakes at strategic positions, ensuring they're far enough from edges
+    const safeZone = minDistFromEdge + 5; // Extra buffer for lake growth
+    const quarterSize = Math.max(safeZone, Math.floor(size / 4));
+    const threeQuarterSize = Math.min(size - safeZone, Math.floor(size * 3 / 4));
+    lakeCenters.push(
+      { x: quarterSize, y: quarterSize, noise: 0 },
+      { x: threeQuarterSize, y: threeQuarterSize, noise: 0 }
+    );
+  } else if (lakeCenters.length === 1) {
+    // If only one center found, add another at a safe distance
+    const existing = lakeCenters[0];
+    const safeZone = minDistFromEdge + 5;
+    const quarterSize = Math.max(safeZone, Math.floor(size / 4));
+    const threeQuarterSize = Math.min(size - safeZone, Math.floor(size * 3 / 4));
+    let newX = existing.x > size / 2 ? quarterSize : threeQuarterSize;
+    let newY = existing.y > size / 2 ? quarterSize : threeQuarterSize;
+    lakeCenters.push({ x: newX, y: newY, noise: 0 });
   }
   
   // Sort by noise value (lowest first) and pick 2-3 best candidates
@@ -108,8 +145,8 @@ function generateLakes(grid: Tile[][], size: number, seed: number): void {
   
   // Grow lakes from each center using radial expansion for rounder shapes
   for (const center of selectedCenters) {
-    // Target size: 15-30 tiles for bigger lakes
-    const targetSize = 15 + Math.floor(Math.random() * 16);
+    // Target size: 40-80 tiles for bigger lakes
+    const targetSize = 40 + Math.floor(Math.random() * 41);
     const lakeTiles: { x: number; y: number }[] = [{ x: center.x, y: center.y }];
     const candidates: { x: number; y: number; dist: number; noise: number }[] = [];
     
@@ -316,7 +353,7 @@ function createAchievements(): Achievement[] {
   ];
 }
 
-export function createInitialGameState(size: number = 120, cityName: string = 'New City'): GameState {
+export function createInitialGameState(size: number = 60, cityName: string = 'New City'): GameState {
   const grid = generateTerrain(size);
 
   return {
