@@ -1464,25 +1464,27 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
     
     if (imageSrc && imageCache.has(imageSrc)) {
       const img = imageCache.get(imageSrc)!;
-      const imgSize = w * sizeMultiplier;
+      const imgHeight = w * sizeMultiplier;
+      const aspectRatio = img.width / img.height || 1;
+      const imgWidth = imgHeight * aspectRatio;
       
       // Calculate position to center building on tile
       // For multi-tile buildings, position relative to frontmost tile so all tiles appear below
-      const drawX = drawPosX + w / 2 - imgSize / 2;
+      const drawX = drawPosX + w / 2 - imgWidth / 2;
       // For multi-tile buildings, draw higher (lower Y) so it appears above all tiles
       // The frontmost tile is drawn last, so we position relative to it
       const baseY = isMultiTile ? drawPosY : y;
       const footprintDepth = isMultiTile ? buildingSize.width + buildingSize.height - 2 : 0;
       const verticalLift = footprintDepth > 0 ? footprintDepth * h * 0.3 : 0;
-      const drawY = baseY - imgSize + h + imgSize * 0.1 - verticalLift;
+      const drawY = baseY - imgHeight + h + imgHeight * 0.1 - verticalLift;
       
       // Draw with crisp rendering
       ctx.drawImage(
         img,
         Math.round(drawX),
         Math.round(drawY),
-        Math.round(imgSize),
-        Math.round(imgSize)
+        Math.round(imgWidth),
+        Math.round(imgHeight)
       );
     }
     

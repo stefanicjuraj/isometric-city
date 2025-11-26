@@ -11,14 +11,33 @@ interface BuildingProps {
   onFire?: boolean;
 }
 
+const DEFAULT_SPRITE_DIMENSIONS = { width: 1024, height: 1024 };
+const SPRITE_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  '/assets/buildings/residential.png': { width: 1024, height: 1024 },
+  '/assets/buildings/commercial.png': { width: 1536, height: 1024 },
+  '/assets/buildings/industrial.png': { width: 2048, height: 2048 },
+  '/assets/buildings/fire_station.png': { width: 1616, height: 1536 },
+  '/assets/buildings/hospital.png': { width: 1648, height: 1748 },
+  '/assets/buildings/park.png': { width: 2048, height: 2048 },
+  '/assets/buildings/police_station.png': { width: 2048, height: 2048 },
+  '/assets/buildings/school.png': { width: 2048, height: 2048 },
+  '/assets/buildings/university.png': { width: 1024, height: 1024 },
+  '/assets/buildings/watertower.png': { width: 1024, height: 1024 },
+  '/assets/buildings/powerplant.png': { width: 1024, height: 1024 },
+  '/assets/buildings/stadium.png': { width: 1024, height: 1024 },
+  '/assets/buildings/airport.png': { width: 1536, height: 1024 },
+  '/assets/buildings/space.png': { width: 1024, height: 1024 },
+  '/assets/buildings/trees.png': { width: 1024, height: 1024 },
+};
+
 // Mapping of building types to their PNG image paths and size multipliers
 const BUILDING_IMAGES: Partial<Record<BuildingType, { src: string; tileWidth: number; tileHeight: number; scale?: number; verticalOffset?: number }>> = {
   // Residential buildings (1x1)
-  house_small: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1 },
-  house_medium: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1 },
-  apartment_low: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1 },
-  apartment_high: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1 },
-  mansion: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1 },
+  house_small: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1, verticalOffset: 12 },
+  house_medium: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1, verticalOffset: 12 },
+  apartment_low: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1, verticalOffset: 14 },
+  apartment_high: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1, verticalOffset: 18 },
+  mansion: { src: '/assets/buildings/residential.png', tileWidth: 1, tileHeight: 1, verticalOffset: 16 },
   // Commercial buildings (1x1)
   shop_small: { src: '/assets/buildings/commercial.png', tileWidth: 1, tileHeight: 1 },
   shop_medium: { src: '/assets/buildings/commercial.png', tileWidth: 1, tileHeight: 1 },
@@ -58,14 +77,18 @@ const ImageBuilding: React.FC<{
   // For multi-tile buildings, scale the image accordingly
   const scaledWidth = size * tileWidth;
   const scaledHeight = getTileHeight(size) * tileHeight;
-  const imageSize = Math.max(scaledWidth, scaledHeight) * 1.8 * scale;
+  const spriteBaseHeight = Math.max(scaledWidth, scaledHeight) * 1.8 * scale;
+  const spriteDims = SPRITE_DIMENSIONS[src] ?? DEFAULT_SPRITE_DIMENSIONS;
+  const aspectRatio = spriteDims.width / spriteDims.height || 1;
+  const renderHeight = spriteBaseHeight;
+  const renderWidth = renderHeight * aspectRatio;
   
   return (
     <div 
       style={{ 
         position: 'relative',
         width: scaledWidth,
-        height: scaledHeight + imageSize * 0.5,
+        height: scaledHeight + renderHeight * 0.5,
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
@@ -74,9 +97,11 @@ const ImageBuilding: React.FC<{
       <Image
         src={src}
         alt={alt}
-        width={imageSize}
-        height={imageSize}
+        width={spriteDims.width}
+        height={spriteDims.height}
         style={{
+          width: renderWidth,
+          height: renderHeight,
           objectFit: 'contain',
           position: 'absolute',
           bottom: -scaledHeight * 0.1 + verticalOffset,
