@@ -205,7 +205,7 @@ const Sidebar = React.memo(function Sidebar() {
   const toolCategories = useMemo(() => ({
     'TOOLS': ['select', 'bulldoze', 'road'] as Tool[],
     'ZONES': ['zone_residential', 'zone_commercial', 'zone_industrial', 'zone_dezone'] as Tool[],
-    'SERVICES': ['police_station', 'fire_station', 'hospital', 'school', 'university', 'park'] as Tool[],
+    'SERVICES': ['police_station', 'fire_station', 'hospital', 'school', 'university', 'park', 'tennis'] as Tool[],
     'UTILITIES': ['power_plant', 'water_tower'] as Tool[],
     'SPECIAL': ['stadium', 'airport', 'space_program'] as Tool[],
   }), []);
@@ -466,7 +466,7 @@ const MiniMap = React.memo(function MiniMap() {
           color = '#c084fc';
         } else if (tile.building.type === 'power_plant') color = '#f97316';
         else if (tile.building.type === 'water_tower') color = '#06b6d4';
-        else if (tile.building.type === 'park') color = '#84cc16';
+        else if (tile.building.type === 'park' || tile.building.type === 'tennis') color = '#84cc16';
         else if (tile.building.onFire) color = '#ef4444';
         
         ctx.fillStyle = color;
@@ -1074,6 +1074,7 @@ const BUILDING_IMAGES: Record<string, string> = {
   fire_station: '/assets/buildings/fire_station.png',
   hospital: '/assets/buildings/hospital.png',
   park: '/assets/buildings/park.png',
+  tennis: '/assets/buildings/tennis.png',
   police_station: '/assets/buildings/police_station.png',
   school: '/assets/buildings/school.png',
   university: '/assets/buildings/university.png',
@@ -1613,8 +1614,8 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
     let rightColor = '#5a8f4f';
     let strokeColor = '#2d4a26';
     
-    const isPark = tile.building.type === 'park';
-    // Check if this is a building (not grass, empty, water, road, tree, or park)
+    const isPark = tile.building.type === 'park' || tile.building.type === 'tennis';
+    // Check if this is a building (not grass, empty, water, road, tree, park, or tennis)
     // Also check if it's part of a multi-tile building footprint
     const isDirectBuilding = !isPark &&
       tile.building.type !== 'grass' &&
@@ -1897,8 +1898,10 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
     } else if (buildingType === 'house_small') {
       imageSrc = BUILDING_IMAGES.residential;
       sizeMultiplier = 1.26; // Scaled down 30% from 1.8
-    } else if (['apartment_low', 'apartment_high', 'mansion'].includes(buildingType)) {
+    } else if (['apartment_low', 'apartment_high'].includes(buildingType)) {
       imageSrc = BUILDING_IMAGES.residential;
+    } else if (buildingType === 'mansion') {
+      imageSrc = BUILDING_IMAGES.mansion;
     } else if (['shop_small', 'shop_medium', 'office_low', 'office_high', 'mall'].includes(buildingType)) {
       imageSrc = BUILDING_IMAGES.commercial;
     } else if (['factory_small', 'factory_medium', 'factory_large', 'warehouse'].includes(buildingType)) {
@@ -1915,6 +1918,7 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
       else if (buildingType === 'fire_station') sizeMultiplier = 1.006; // Scaled down 10% from 1.118
       else if (buildingType === 'police_station') sizeMultiplier = 1.35; // Scaled down 25% from 1.8
       else if (buildingType === 'park') sizeMultiplier = 1.134; // Scaled down 40% total (30% + 10%) from 1.8
+      else if (buildingType === 'tennis') sizeMultiplier = 1.26; // Similar to house_medium
     }
     
     if (imageSrc && imageCache.has(imageSrc)) {

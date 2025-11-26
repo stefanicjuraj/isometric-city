@@ -615,6 +615,7 @@ function calculateStats(grid: Tile[][], size: number, budget: Budget, taxRate: n
       if (building.type === 'tree') treeCount++;
       if (building.type === 'water') waterCount++;
       if (building.type === 'park') parkCount++;
+      if (building.type === 'tennis') parkCount++; // Tennis courts count as parks
     }
   }
 
@@ -715,6 +716,7 @@ function updateBudgetCosts(grid: Tile[][], budget: Budget): Budget {
         case 'school': schoolCount++; break;
         case 'university': universityCount++; break;
         case 'park': parkCount++; break;
+        case 'tennis': parkCount++; break; // Tennis courts count as parks
         case 'power_plant': powerCount++; break;
         case 'water_tower': waterCount++; break;
         case 'road': roadCount++; break;
@@ -1139,8 +1141,8 @@ export function placeBuilding(
     }
   }
 
-  // Can't place parks on roads
-  if (buildingType === 'park' && tile.building.type === 'road') {
+  // Can't place parks or tennis courts on roads
+  if ((buildingType === 'park' || buildingType === 'tennis') && tile.building.type === 'road') {
     return state;
   }
 

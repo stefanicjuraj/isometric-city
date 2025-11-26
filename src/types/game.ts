@@ -30,6 +30,7 @@ export type BuildingType =
   | 'school'
   | 'university'
   | 'park'
+  | 'tennis'
   // Utilities
   | 'power_plant'
   | 'water_tower'
@@ -55,6 +56,7 @@ export type Tool =
   | 'school'
   | 'university'
   | 'park'
+  | 'tennis'
   | 'power_plant'
   | 'water_tower'
   | 'stadium'
@@ -83,6 +85,7 @@ export const TOOL_INFO: Record<Tool, ToolInfo> = {
   school: { name: 'School', cost: 400, description: 'Basic education (2x2)', size: 2 },
   university: { name: 'University', cost: 2000, description: 'Higher education (3x2)', size: 3 },
   park: { name: 'Park', cost: 150, description: 'Boost happiness and land value', size: 1 },
+  tennis: { name: 'Tennis Court', cost: 200, description: 'Recreation facility', size: 1 },
   power_plant: { name: 'Power Plant', cost: 3000, description: 'Generate electricity (2x2)', size: 2 },
   water_tower: { name: 'Water Tower', cost: 1000, description: 'Provide water', size: 1 },
   stadium: { name: 'Stadium', cost: 5000, description: 'Major entertainment (3x3)', size: 3 },
@@ -243,6 +246,7 @@ export const BUILDING_STATS: Record<BuildingType, { maxPop: number; maxJobs: num
   school: { maxPop: 0, maxJobs: 25, pollution: 0, landValue: 15 },
   university: { maxPop: 0, maxJobs: 100, pollution: 0, landValue: 35 },
   park: { maxPop: 0, maxJobs: 2, pollution: -10, landValue: 20 },
+  tennis: { maxPop: 0, maxJobs: 1, pollution: -5, landValue: 15 },
   power_plant: { maxPop: 0, maxJobs: 30, pollution: 30, landValue: -20 },
   water_tower: { maxPop: 0, maxJobs: 5, pollution: 0, landValue: 5 },
   stadium: { maxPop: 0, maxJobs: 50, pollution: 5, landValue: 40 },
