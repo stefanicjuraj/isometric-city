@@ -1935,7 +1935,7 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile }: {
         drawY += h * 1.0; // Shift stadium down more
       }
       if (buildingType === 'water_tower') {
-        drawY += h * 0.15; // Shift water tower downward slightly
+        drawY -= h * 0.1; // Shift water tower upward slightly
       }
       
       // Draw with crisp rendering
