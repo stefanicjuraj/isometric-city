@@ -316,6 +316,7 @@ export function SettingsPanel() {
               }}
             >
               Load Example State 5
+            </Button>
           </div>
         </div>
       </DialogContent>
