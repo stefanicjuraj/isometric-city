@@ -6722,9 +6722,15 @@ function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile, isMob
               } else if (isParksBuilding && activePack.parksVerticalOffsets && buildingType in activePack.parksVerticalOffsets) {
                 // Parks buildings may need specific positioning
                 extraOffset = activePack.parksVerticalOffsets[buildingType] * h;
-              } else if (isDenseVariant && activePack.denseVerticalOffsets && buildingType in activePack.denseVerticalOffsets) {
+              } else if (isDenseVariant && useDenseVariant) {
                 // Dense variants may need different positioning than normal
-                extraOffset = activePack.denseVerticalOffsets[buildingType] * h;
+                // Check for variant-specific offset first (format: buildingType_row_col)
+                const variantKey = `${buildingType}_${useDenseVariant.row}_${useDenseVariant.col}`;
+                if (activePack.denseVariantVerticalOffsets && variantKey in activePack.denseVariantVerticalOffsets) {
+                  extraOffset = activePack.denseVariantVerticalOffsets[variantKey] * h;
+                } else if (activePack.denseVerticalOffsets && buildingType in activePack.denseVerticalOffsets) {
+                  extraOffset = activePack.denseVerticalOffsets[buildingType] * h;
+                }
               } else if (isFarmVariant && activePack.farmsVerticalOffsets && buildingType in activePack.farmsVerticalOffsets) {
                 // Farm variants may need different positioning than normal
                 extraOffset = activePack.farmsVerticalOffsets[buildingType] * h;

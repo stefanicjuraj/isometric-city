@@ -63,6 +63,9 @@ export interface SpritePack {
   // Per-building-type vertical offset adjustments for DENSE variant sprites only
   // These override verticalOffsets when rendering dense variants
   denseVerticalOffsets?: Record<string, number>;
+  // Per-dense-variant vertical offset adjustments (takes precedence over denseVerticalOffsets)
+  // Key format: "buildingType_row_col" (e.g., "apartment_high_0_3" for apartment_high at row 0, col 3)
+  denseVariantVerticalOffsets?: Record<string, number>;
   // Per-building-type scale adjustments for DENSE variant sprites only
   // Values are multiplied with the normal scale (e.g., 0.95 = 95% of normal size)
   denseScales?: Record<string, number>;
@@ -261,6 +264,10 @@ const SPRITE_PACK_SPRITES4: SpritePack = {
     // Dense apartment_high shifted up 0.2 tiles from -0.60
     apartment_high: -0.80, // Shifted up 0.2 tiles from -0.60
     factory_large: -1.2, // Dense variant shifted up 0.2
+  },
+  denseVariantVerticalOffsets: {
+    // Per-variant offsets override denseVerticalOffsets for specific row/col
+    apartment_high_0_3: -0.6, // First row, 4th column - shifted 0.1 tiles down from -0.80
   },
   denseScales: {
     // Dense apartment_high scaled down 10% total (5% more from 0.95)
