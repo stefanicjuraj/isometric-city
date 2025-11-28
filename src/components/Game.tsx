@@ -1173,7 +1173,7 @@ function SettingsPanel() {
 // Background color to filter
 const BACKGROUND_COLOR = { r: 255, g: 0, b: 0 };
 // Color distance threshold - pixels within this distance will be made transparent
-const COLOR_THRESHOLD = 165; // Adjust this value to be more/less aggressive (increased from 10 for better filtering)
+const COLOR_THRESHOLD = 155; // Adjust this value to be more/less aggressive (increased from 10 for better filtering)
 
 /**
  * Filters colors close to the background color from an image, making them transparent
