@@ -2318,12 +2318,12 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
       }
       
       // Draw interior sidewalk corners at 4-way intersections
-      // Simple isometric diamond shapes at each corner
+      // Wider isometric diamond shapes at each corner
       if (north && east && south && west) {
         ctx.fillStyle = sidewalkColor;
         
-        // Small isometric diamond size
-        const dSize = swWidth * 0.9;
+        // Diamond dimensions - balanced square-like shape
+        const dSize = swWidth * 1.1;
         
         // Top corner - isometric diamond
         ctx.beginPath();
@@ -2338,8 +2338,8 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
         ctx.beginPath();
         ctx.moveTo(rightCorner.x, rightCorner.y);
         ctx.lineTo(rightCorner.x - dSize, rightCorner.y - dSize * 0.5);
-        ctx.lineTo(rightCorner.x - dSize * 2, rightCorner.y);
         ctx.lineTo(rightCorner.x - dSize, rightCorner.y + dSize * 0.5);
+        ctx.lineTo(rightCorner.x - dSize * 2, rightCorner.y);
         ctx.closePath();
         ctx.fill();
         
@@ -2548,8 +2548,10 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
           }
         }
         
-        // Draw yellow center dashes for ALL roads (including intersections)
-        {
+        // Draw yellow center dashes for non-intersection roads only
+        // Skip if this tile IS an intersection (3+ adjacent roads)
+        const thisIsIntersection = [north, east, south, west].filter(Boolean).length >= 3;
+        if (!thisIsIntersection) {
           ctx.strokeStyle = ROAD_COLORS.CENTER_LINE;
           ctx.lineWidth = 0.8;
           ctx.setLineDash([1.5, 2]);
