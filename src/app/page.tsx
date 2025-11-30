@@ -91,7 +91,7 @@ function loadSavedCities(): SavedCityMeta[] {
 }
 
 // Sprite Gallery component that renders sprites using canvas (like SpriteTestPanel)
-function SpriteGallery({ count = 16, cols = 4 }: { count?: number; cols?: number }) {
+function SpriteGallery({ count = 16, cols = 4, cellSize = 120 }: { count?: number; cols?: number; cellSize?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [filteredSheet, setFilteredSheet] = useState<HTMLCanvasElement | null>(null);
   const spritePack = useMemo(() => getSpritePack(DEFAULT_SPRITE_PACK_ID), []);
@@ -145,7 +145,6 @@ function SpriteGallery({ count = 16, cols = 4 }: { count?: number; cols?: number
     
     const dpr = window.devicePixelRatio || 1;
     const rows = Math.ceil(spriteData.length / cols);
-    const cellSize = 120;
     const padding = 10;
     
     const canvasWidth = cols * cellSize;
@@ -201,7 +200,7 @@ function SpriteGallery({ count = 16, cols = 4 }: { count?: number; cols?: number
         Math.round(destWidth), Math.round(destHeight)
       );
     });
-  }, [filteredSheet, spriteData, cols]);
+  }, [filteredSheet, spriteData, cols, cellSize]);
   
   return (
     <canvas
@@ -298,12 +297,10 @@ export default function HomePage() {
           IsoCity
         </h1>
         
-        {/* Sprite Gallery - hide if there are saved cities to save space */}
-        {savedCities.length === 0 && (
-          <div className="mb-6">
-            <SpriteGallery count={9} cols={3} />
-          </div>
-        )}
+        {/* Sprite Gallery - keep visible even when saves exist */}
+        <div className="mb-6">
+          <SpriteGallery count={9} cols={3} cellSize={72} />
+        </div>
         
         {/* Buttons */}
         <div className="flex flex-col gap-3 w-full max-w-xs">
