@@ -2,6 +2,7 @@
 // IMAGE LOADING UTILITIES
 // ============================================================================
 // Handles loading and caching of sprite images with optional background filtering
+// and WebP optimization for faster loading on slow connections.
 
 // Background color to filter from sprite sheets
 const BACKGROUND_COLOR = { r: 255, g: 0, b: 0 };
@@ -11,9 +12,46 @@ const COLOR_THRESHOLD = 155; // Adjust this value to be more/less aggressive
 // Image cache for building sprites
 const imageCache = new Map<string, HTMLImageElement>();
 
+// Track WebP support (detected once on first use)
+let webpSupported: boolean | null = null;
+
 // Event emitter for image loading progress (to trigger re-renders)
 type ImageLoadCallback = () => void;
 const imageLoadCallbacks = new Set<ImageLoadCallback>();
+
+/**
+ * Check if the browser supports WebP format
+ * Uses a small test image to detect support
+ */
+async function checkWebPSupport(): Promise<boolean> {
+  if (webpSupported !== null) {
+    return webpSupported;
+  }
+  
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      webpSupported = img.width > 0 && img.height > 0;
+      resolve(webpSupported);
+    };
+    img.onerror = () => {
+      webpSupported = false;
+      resolve(false);
+    };
+    // Tiny 1x1 WebP image
+    img.src = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+  });
+}
+
+/**
+ * Get the WebP path for a PNG image
+ */
+function getWebPPath(src: string): string | null {
+  if (src.endsWith('.png')) {
+    return src.replace(/\.png$/, '.webp');
+  }
+  return null;
+}
 
 /**
  * Register a callback to be notified when images are loaded
@@ -32,25 +70,55 @@ function notifyImageLoaded() {
 }
 
 /**
- * Load an image from a source URL
+ * Load an image directly without WebP optimization
  * @param src The image source path
  * @returns Promise resolving to the loaded image
  */
-export function loadImage(src: string): Promise<HTMLImageElement> {
-  if (imageCache.has(src)) {
-    return Promise.resolve(imageCache.get(src)!);
-  }
-  
+function loadImageDirect(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       imageCache.set(src, img);
-      notifyImageLoaded(); // Notify listeners that a new image is available
+      notifyImageLoaded();
       resolve(img);
     };
     img.onerror = reject;
     img.src = src;
   });
+}
+
+/**
+ * Load an image from a source URL, preferring WebP if available
+ * @param src The image source path (PNG)
+ * @returns Promise resolving to the loaded image
+ */
+export async function loadImage(src: string): Promise<HTMLImageElement> {
+  // Return cached image if available
+  if (imageCache.has(src)) {
+    return imageCache.get(src)!;
+  }
+  
+  // Check if we should try WebP
+  const webpPath = getWebPPath(src);
+  if (webpPath) {
+    const supportsWebP = await checkWebPSupport();
+    
+    if (supportsWebP) {
+      // Try loading WebP first
+      try {
+        const img = await loadImageDirect(webpPath);
+        // Also cache under the PNG path for future lookups
+        imageCache.set(src, img);
+        return img;
+      } catch {
+        // WebP failed (file might not exist), fall back to PNG
+        console.debug(`WebP not available for ${src}, using PNG`);
+      }
+    }
+  }
+  
+  // Load PNG directly
+  return loadImageDirect(src);
 }
 
 /**
