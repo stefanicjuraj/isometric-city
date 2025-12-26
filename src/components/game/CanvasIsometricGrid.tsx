@@ -1744,28 +1744,23 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
       const towerPerpY = dx / travelLen;
       
       // ============================================================
-      // DRAW SUPPORT PILLARS FIRST (they go into the water)
+      // DRAW SUPPORT PILLARS (one per tile, at front position to avoid z-order issues)
       // ============================================================
       const pillarW = 4;
       const pillarH = 22; // Extended further down into water
-      const pillarInset = 0.22; // How far from edges to place pillars (moved inwards)
       
-      ctx.fillStyle = style.support;
+      // Only draw pillar on every other tile to reduce count, and place at front position (0.65)
+      // to avoid being covered by water tiles rendered later
+      const shouldDrawPillar = (bridgeIndex % 2 === 0) || position === 'start' || position === 'end';
       
-      // Draw pillars at consistent positions along the bridge
-      // Position them at 15% and 85% of the tile to connect smoothly between tiles
-      if (position !== 'start' && position !== 'end') {
-        // Middle tiles get 2 pillars
-        const pillar1 = {
-          x: startEdge.x + (endEdge.x - startEdge.x) * pillarInset,
-          y: startEdge.y + (endEdge.y - startEdge.y) * pillarInset
-        };
-        const pillar2 = {
-          x: startEdge.x + (endEdge.x - startEdge.x) * (1 - pillarInset),
-          y: startEdge.y + (endEdge.y - startEdge.y) * (1 - pillarInset)
+      if (shouldDrawPillar) {
+        // Place pillar toward the "end" edge (front in render order) to avoid z-order issues
+        const pillarT = 0.65; // Position along the tile (0.65 = toward end/front)
+        const pillarPos = {
+          x: startEdge.x + (endEdge.x - startEdge.x) * pillarT,
+          y: startEdge.y + (endEdge.y - startEdge.y) * pillarT
         };
         
-        // Isometric pillar shape (3D column going into water)
         const drawPillar = (px: number, py: number) => {
           // Draw the side face first (darker)
           ctx.fillStyle = '#303030';
@@ -1788,43 +1783,6 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
           ctx.fill();
           
           // Draw the top face
-          ctx.fillStyle = style.support;
-          ctx.beginPath();
-          ctx.moveTo(px, py - pillarW/2);
-          ctx.lineTo(px + pillarW, py);
-          ctx.lineTo(px, py + pillarW/2);
-          ctx.lineTo(px - pillarW, py);
-          ctx.closePath();
-          ctx.fill();
-        };
-        
-        drawPillar(pillar1.x, pillar1.y);
-        drawPillar(pillar2.x, pillar2.y);
-      } else {
-        // Start/end tiles get 1 pillar (at the water edge)
-        const pillarPos = position === 'start' 
-          ? { x: startEdge.x + (endEdge.x - startEdge.x) * (1 - pillarInset), y: startEdge.y + (endEdge.y - startEdge.y) * (1 - pillarInset) }
-          : { x: startEdge.x + (endEdge.x - startEdge.x) * pillarInset, y: startEdge.y + (endEdge.y - startEdge.y) * pillarInset };
-        
-        const drawPillar = (px: number, py: number) => {
-          ctx.fillStyle = '#303030';
-          ctx.beginPath();
-          ctx.moveTo(px - pillarW, py);
-          ctx.lineTo(px - pillarW, py + pillarH);
-          ctx.lineTo(px, py + pillarH + pillarW/2);
-          ctx.lineTo(px, py + pillarW/2);
-          ctx.closePath();
-          ctx.fill();
-          
-          ctx.fillStyle = '#404040';
-          ctx.beginPath();
-          ctx.moveTo(px, py + pillarW/2);
-          ctx.lineTo(px, py + pillarH + pillarW/2);
-          ctx.lineTo(px + pillarW, py + pillarH);
-          ctx.lineTo(px + pillarW, py);
-          ctx.closePath();
-          ctx.fill();
-          
           ctx.fillStyle = style.support;
           ctx.beginPath();
           ctx.moveTo(px, py - pillarW/2);
