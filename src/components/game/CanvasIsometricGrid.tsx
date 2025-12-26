@@ -2122,17 +2122,18 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
       if (bridgeType === 'large' && currentZoom >= 0.5) {
         ctx.strokeStyle = style.accent;
         ctx.lineWidth = 1.5;
-        const trussH = 6; // 30% shorter than before (was 8)
+        const trussHLeft = 3;
+        const trussHRight = 5;
         
         // Top beams on both sides (using tile-edge-aligned direction)
         ctx.beginPath();
-        ctx.moveTo(startLeft.x, startLeft.y - trussH);
-        ctx.lineTo(endLeft.x, endLeft.y - trussH);
+        ctx.moveTo(startLeft.x, startLeft.y - trussHLeft);
+        ctx.lineTo(endLeft.x, endLeft.y - trussHLeft);
         ctx.stroke();
         
         ctx.beginPath();
-        ctx.moveTo(startRight.x, startRight.y - trussH);
-        ctx.lineTo(endRight.x, endRight.y - trussH);
+        ctx.moveTo(startRight.x, startRight.y - trussHRight);
+        ctx.lineTo(endRight.x, endRight.y - trussHRight);
         ctx.stroke();
         
         // Vertical supports
@@ -2145,12 +2146,12 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
           
           ctx.beginPath();
           ctx.moveTo(leftX, leftY);
-          ctx.lineTo(leftX, leftY - trussH);
+          ctx.lineTo(leftX, leftY - trussHLeft);
           ctx.stroke();
           
           ctx.beginPath();
           ctx.moveTo(rightX, rightY);
-          ctx.lineTo(rightX, rightY - trussH);
+          ctx.lineTo(rightX, rightY - trussHRight);
           ctx.stroke();
         }
       }
