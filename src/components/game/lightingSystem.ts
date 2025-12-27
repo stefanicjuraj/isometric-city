@@ -89,6 +89,8 @@ export interface LightingSystemConfig {
   isMobile: boolean;
   isPanningRef: React.MutableRefObject<boolean>;
   isPinchZoomingRef: React.MutableRefObject<boolean>;
+  /** Boolean state value to trigger re-render when panning stops */
+  isPanning: boolean;
 }
 
 // ============================================================================
@@ -315,6 +317,7 @@ export function useLightingSystem(config: LightingSystemConfig): void {
     isMobile,
     isPanningRef,
     isPinchZoomingRef,
+    isPanning,
   } = config;
 
   useEffect(() => {
@@ -401,5 +404,6 @@ export function useLightingSystem(config: LightingSystemConfig): void {
     
   // PERF: Use worldStateRef instead of grid/gridSize in deps to avoid re-running on every simulation tick
   // Lighting only needs to update when visualHour changes or viewport moves, not every time grid state changes
-  }, [canvasRef, worldStateRef, visualHour, offset, zoom, canvasWidth, canvasHeight, isMobile, isPanningRef, isPinchZoomingRef]);
+  // Note: isPanning (boolean state) is in deps so the effect re-runs when panning stops; refs alone don't trigger re-renders
+  }, [canvasRef, worldStateRef, visualHour, offset, zoom, canvasWidth, canvasHeight, isMobile, isPanningRef, isPinchZoomingRef, isPanning]);
 }

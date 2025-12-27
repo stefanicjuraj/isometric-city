@@ -2942,6 +2942,7 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
     isMobile,
     isPanningRef,
     isPinchZoomingRef,
+    isPanning,
   });
   
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
