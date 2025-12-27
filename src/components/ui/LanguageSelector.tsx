@@ -159,7 +159,7 @@ export function LanguageSelector({
         ) : (
           <Button variant={variant} size="sm" className={`gap-2 ${className}`}>
             <GlobeIcon size={iconSize} />
-            <span className="text-xs">{currentLanguage.name}</span>
+            <span className="text-xs hidden xl:inline">{currentLanguage.name}</span>
           </Button>
         )}
       </DropdownMenuTrigger>

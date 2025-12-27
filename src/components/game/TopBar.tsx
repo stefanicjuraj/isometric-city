@@ -213,7 +213,7 @@ export const TopBar = React.memo(function TopBar() {
         </div>
       </div>
       
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-4">
         <StatBadge value={stats.population.toLocaleString()} label="Population" />
         <StatBadge value={stats.jobs.toLocaleString()} label="Jobs" />
         <StatBadge 
@@ -229,8 +229,8 @@ export const TopBar = React.memo(function TopBar() {
         />
       </div>
       
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <DemandIndicator label="R" demand={stats.demand.residential} color="text-green-500" />
           <DemandIndicator label="C" demand={stats.demand.commercial} color="text-blue-500" />
           <DemandIndicator label="I" demand={stats.demand.industrial} color="text-amber-500" />
@@ -238,7 +238,7 @@ export const TopBar = React.memo(function TopBar() {
         
         <Separator orientation="vertical" className="h-8" />
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <span className="text-muted-foreground text-xs">Tax</span>
           <Slider
             value={[taxRate]}
@@ -246,9 +246,9 @@ export const TopBar = React.memo(function TopBar() {
             min={0}
             max={100}
             step={1}
-            className="w-16"
+            className="w-14"
           />
-          <span className="text-foreground text-xs font-mono tabular-nums w-8">{taxRate}%</span>
+          <span className="text-foreground text-xs font-mono tabular-nums w-7">{taxRate}%</span>
         </div>
         
         <Separator orientation="vertical" className="h-8" />
