@@ -1178,14 +1178,23 @@ export function createInitialGameState(size: number = DEFAULT_GRID_SIZE, cityNam
 
 // Service building configuration - defined once, reused across calls
 // Exported so overlay rendering can access radii
+const withRange = <R extends number, T extends Record<string, unknown>>(
+  range: R,
+  extra: T
+): { range: R; rangeSquared: number } & T => ({
+  range,
+  rangeSquared: range * range,
+  ...extra,
+});
+
 export const SERVICE_CONFIG = {
-  police_station: { range: 13, rangeSquared: 169, type: 'police' as const },
-  fire_station: { range: 18, rangeSquared: 324, type: 'fire' as const },
-  hospital: { range: 12, rangeSquared: 144, type: 'health' as const },
-  school: { range: 11, rangeSquared: 121, type: 'education' as const },
-  university: { range: 19, rangeSquared: 361, type: 'education' as const },
-  power_plant: { range: 15, rangeSquared: 225 },
-  water_tower: { range: 12, rangeSquared: 144 },
+  police_station: withRange(13, { type: 'police' as const }),
+  fire_station: withRange(18, { type: 'fire' as const }),
+  hospital: withRange(24, { type: 'health' as const }), // 2x service radius
+  school: withRange(11, { type: 'education' as const }),
+  university: withRange(19, { type: 'education' as const }),
+  power_plant: withRange(15, {}),
+  water_tower: withRange(12, {}),
 } as const;
 
 // Building types that provide services
