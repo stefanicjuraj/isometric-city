@@ -117,7 +117,7 @@ export function ShareModal({ open, onOpenChange }: ShareModalProps) {
               {/* Continue Button */}
               <Button
                 onClick={() => onOpenChange(false)}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-slate-700 hover:bg-slate-600 text-white border border-slate-600"
               >
                 Continue Playing
               </Button>

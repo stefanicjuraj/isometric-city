@@ -115,8 +115,11 @@ export class MultiplayerProvider {
     this.operationsArray.observe((event) => {
       if (event.changes.added.size > 0) {
         const newOps = this.operationsArray.slice(this.lastAppliedIndex);
+        console.log(`[MP] Ops observer: ${newOps.length} new ops, total: ${this.operationsArray.length}`);
         for (const op of newOps) {
-          if (op.playerId !== this.peerId && this.options.onAction) {
+          const isRemote = op.playerId !== this.peerId;
+          console.log(`[MP] Op: ${op.type} from ${op.playerId}, isRemote: ${isRemote}, hasCallback: ${!!this.options.onAction}`);
+          if (isRemote && this.options.onAction) {
             this.options.onAction(op);
           }
         }
@@ -463,8 +466,10 @@ export class MultiplayerProvider {
 
   private setupDataChannel(channel: RTCDataChannel, remotePeerId: string): void {
     this.dataChannels.set(remotePeerId, channel);
+    console.log(`[MP] Data channel set up with ${remotePeerId}, state: ${channel.readyState}`);
 
     channel.onopen = () => {
+      console.log(`[MP] Data channel OPEN with ${remotePeerId}`);
       // Sync Y.js document
       this.syncDocument(remotePeerId);
       
@@ -479,6 +484,7 @@ export class MultiplayerProvider {
     };
 
     channel.onclose = () => {
+      console.log(`[MP] Data channel CLOSED with ${remotePeerId}`);
       this.dataChannels.delete(remotePeerId);
     };
   }
@@ -501,6 +507,7 @@ export class MultiplayerProvider {
   private handleDataChannelMessage(data: string, remotePeerId: string): void {
     try {
       const message = JSON.parse(data) as DataChannelMessage;
+      console.log(`[MP] Received: ${message.type} from ${remotePeerId}`);
 
       if (message.type === 'sync') {
         // Apply Y.js update
@@ -510,6 +517,7 @@ export class MultiplayerProvider {
         // Apply incremental Y.js update
         const update = new Uint8Array(message.data as number[]);
         Y.applyUpdate(this.doc, update);
+        console.log(`[MP] Applied Y.js update, ops count: ${this.operationsArray.length}`);
       } else if (message.type === 'awareness') {
         // Update remote awareness
         // Note: This is simplified - full awareness protocol is more complex
@@ -719,7 +727,12 @@ export class MultiplayerProvider {
 
     // Broadcast to all peers via data channels
     const update = Y.encodeStateAsUpdate(this.doc);
-    this.dataChannels.forEach((channel) => {
+    
+    // Debug: Log dispatch info
+    console.log(`[MP] Dispatch: ${action.type}, channels: ${this.dataChannels.size}, localFallback: ${this.useLocalFallback}`);
+    
+    this.dataChannels.forEach((channel, peerId) => {
+      console.log(`[MP] Channel to ${peerId}: ${channel.readyState}`);
       if (channel.readyState === 'open') {
         channel.send(JSON.stringify({ type: 'update', data: Array.from(update) }));
       }

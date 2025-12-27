@@ -116,9 +116,14 @@ export function useMultiplayerSync() {
   }, [multiplayer, multiplayer?.connectionState, game]);
 
   // Keep the shared game state updated (for new peers joining)
-  // This runs on every state change for the host
+  // Throttled to avoid excessive updates - only updates every 2 seconds
+  const lastUpdateRef = useRef<number>(0);
   useEffect(() => {
     if (!multiplayer || !multiplayer.isHost || multiplayer.connectionState !== 'connected') return;
+    
+    const now = Date.now();
+    if (now - lastUpdateRef.current < 2000) return; // Throttle to 2 second intervals
+    lastUpdateRef.current = now;
     
     // Update the game state that will be sent to new peers
     multiplayer.updateGameState(game.state);

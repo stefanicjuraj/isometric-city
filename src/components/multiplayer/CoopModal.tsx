@@ -337,7 +337,7 @@ export function CoopModal({
               {/* Continue button - game already started, just close the modal */}
               <Button
                 onClick={() => onOpenChange(false)}
-                className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+                className="w-full mt-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-md"
               >
                 Continue Playing
               </Button>
