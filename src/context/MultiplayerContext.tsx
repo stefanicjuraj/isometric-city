@@ -48,6 +48,9 @@ interface MultiplayerContextValue {
   // Is this player the host?
   isHost: boolean;
   
+  // Update the game state that will be sent to new peers (host only)
+  updateGameState: (state: GameState) => void;
+  
   // Provider instance (for advanced usage)
   provider: MultiplayerProvider | null;
 }
@@ -240,6 +243,16 @@ export function MultiplayerContextProvider({
     []
   );
 
+  // Update the game state that will be sent to new peers (host only)
+  const updateGameState = useCallback(
+    (state: GameState) => {
+      if (providerRef.current && role === 'host') {
+        providerRef.current.updateGameState(state);
+      }
+    },
+    [role]
+  );
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
@@ -263,6 +276,7 @@ export function MultiplayerContextProvider({
     onRemoteAction: onRemoteActionRef.current,
     setOnRemoteAction,
     isHost: role === 'host',
+    updateGameState,
     provider: providerRef.current,
   };
 

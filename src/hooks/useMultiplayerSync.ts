@@ -68,6 +68,15 @@ export function useMultiplayerSync() {
     };
   }, [multiplayer, multiplayer?.connectionState, game]);
 
+  // Keep the shared game state updated (for new peers joining)
+  // This runs on every state change for the host
+  useEffect(() => {
+    if (!multiplayer || !multiplayer.isHost || multiplayer.connectionState !== 'connected') return;
+    
+    // Update the game state that will be sent to new peers
+    multiplayer.updateGameState(game.state);
+  }, [multiplayer, game.state]);
+
   // Apply a remote action to the local game state
   const applyRemoteAction = useCallback((action: GameAction) => {
     switch (action.type) {
